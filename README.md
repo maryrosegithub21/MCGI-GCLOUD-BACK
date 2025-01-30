@@ -1,4 +1,5 @@
-# Search-and-Print-Each-Data-From-Google-Sheet 
+# MCGI-BACK
+ This is a fully responsive web application for Members Church Of God International, leveraging React.js for the front-end and Node.js for the back end. Robust authentication and authorization were implemented using OAuth. The application features a user-friendly interface designed to facilitate key functions such as membership management, event registration, and online giving. For content management and database storage, I integrate Google Suite (Docs, Sheets). CORS was utilized to handle cross-origin requests, ensuring secure communication between the front end and back end
 
 This project is a React application that interacts with Google Sheets to display and manage data. It allows users to search, view, and generate PDFs from the data retrieved from a Google Sheet. The application also requires a valid Church ID for access.
 
