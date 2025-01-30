@@ -12,13 +12,8 @@ app.use(cors());
 const port = process.env.PORT || 8080;
 const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
 const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-const range = 'Members!A:Z';
+const range = process.env.GOOGLE_SHEETS_RANGE;
 const apiKey = process.env.GEMINI_API_KEY;
-
-// const auth = new google.auth.GoogleAuth({
-//     keyFile: credentialsPath,
-//     scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-// });
 
 // Asynchronous Google Auth initialization
 async function initializeGoogleAuth() {
