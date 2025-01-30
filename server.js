@@ -9,24 +9,40 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 8080;
 const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
 const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 const range = 'Members!A:Z';
 const apiKey = process.env.GEMINI_API_KEY;
 
-const auth = new google.auth.GoogleAuth({
-    keyFile: credentialsPath,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-});
+// const auth = new google.auth.GoogleAuth({
+//     keyFile: credentialsPath,
+//     scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+// });
+
+// Asynchronous Google Auth initialization
+async function initializeGoogleAuth() {
+  try {
+    const auth = new google.auth.GoogleAuth({
+      keyFile: credentialsPath, // Or keyFilename if you're using a JSON file
+      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    });
+    return await auth.getClient(); // Get the authenticated client
+  } catch (error) {
+    console.error("Error initializing Google Auth:", error);
+    process.exit(1); // Exit the process if authentication fails
+  }
+}
+
 
 // Login Endpoint (Keep this as it is)
+initializeGoogleAuth().then(authClient => {
 app.post('/api/login', async (req, res) => {
   const { email, password, churchid } = req.body;
   console.log("Received login request:", { email, churchid }); // Log received credentials
   
     try {
-      const sheets = google.sheets({ version: 'v4', auth });
+      const sheets = google.sheets({ version: 'v4', auth: authClient });
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: spreadsheetId,
         range: range,
@@ -61,7 +77,7 @@ app.post('/api/login', async (req, res) => {
         res.status(200).json({ message: 'Login successful', user });
       } else {
         console.log("Login failed for:", email);
-        res.status(401).json({ message: 'Invalid credentials' });
+        res.status(401).json({ message: 'Wrong Email, Password or ChurchId' });
       }
     } catch (error) {
       console.error('Error verifying login:', error);
@@ -137,6 +153,15 @@ app.post('/api/gemini-chat', async (req, res) => {
     }
 });
 
+app.get('/', (req, res) => {
+  res.send('Hello from a minimal server!');
+});
+
+
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
+});
+}).catch(error => {
+  console.error("Server startup error:", error);
+  process.exit(1); // Exit the process if any startup error occurs
 });
