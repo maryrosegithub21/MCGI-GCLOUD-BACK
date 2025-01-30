@@ -1,7 +1,0 @@
-runtime: nodejs18
-env_variables:
-  REACT_APP_GOOGLE_API_KEY: AIzaSyA5zqd9VYyHJCgtcVwyE9Rjxj1kyM2cj-I
-  REACT_APP_SPREADSHEET_ID: 1hLJQ_XJRgvb2W1kYpzZrafITXLRu6vtiim_yS8hnoyU
-handlers:
-- url: /.*
-  script: auto
