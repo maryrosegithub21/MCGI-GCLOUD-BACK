@@ -161,7 +161,7 @@
 //   process.exit(1); // Exit the process if any startup error occurs
 // });
 
-
+const {fetchAndFilterData} = require('./googleSheetsUtils'); // Import the function
 const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const express = require('express');
 const {google} = require('googleapis');
@@ -214,22 +214,30 @@ async function startServer() {
             credentials: credentialsObject,
             scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
         });
+        const sheets = google.sheets({version: 'v4', auth: authClient}); // Initialize sheets API outside
 
+        // Function to fetch data from Google Sheets
         async function fetchGoogleSheetsData() {
-          const sheets = google.sheets({version: 'v4', auth: authClient});
-          const response = await sheets.spreadsheets.values.get({
-              spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-              range: process.env.GOOGLE_SHEETS_RANGE,
-          });
-          return response.data.values; // Return the sheet data
+          try {
+              const response = await sheets.spreadsheets.values.get({
+                  spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+                  range: process.env.GOOGLE_SHEETS_RANGE,
+              });
+              return response.data.values;
+          } catch (sheetsError) {
+              console.error("Error fetching Google Sheet ", sheetsError);
+              throw sheetsError; // Re-throw the error to be caught by the login endpoint
+          }
       }
 
         // ... (login endpoint code using authClient)
         app.post('/api/login', async (req, res) => { 
           const { email, password, churchid } = req.body;
             console.log("Received login request:", { email, churchid }); // Log received credentials
-            const rows = await fetchGoogleSheetsData(); // Fetch data here
+           
               try {
+                // const rows = await fetchGoogleSheetsData(); // Fetch data here
+                
                 
                 const sheets = google.sheets({ version: 'v4', auth: authClient });
                 const response = await sheets.spreadsheets.values.get({
@@ -240,15 +248,18 @@ async function startServer() {
                   
                 });
             
-                if (!rows) {
-                  return res.status(500).json({message: 'Error fetching data from Google Sheets'});
-              }
+
                 if (!response.data || !response.data.values) {
                   console.error("No data received from Google Sheets or no values present.");
                   return res.status(500).json({ message: 'Error fetching data from Google Sheets' });
                 }
             
-                const rows = response.data.values;
+                // const rows = response.data.values;
+                const rows = await fetchGoogleSheetsData(authClient, process.env.GOOGLE_SHEETS_ID, process.env.GOOGLE_SHEETS_RANGE); // Use the functio
+                
+                if (!rows) {
+                  return res.status(500).json({message: 'Error fetching data from Google Sheets'});
+                }
             
                 const user = rows.find(row => {
                   const rowEmail = row[1];
