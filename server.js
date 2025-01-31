@@ -215,19 +215,34 @@ async function startServer() {
             scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
         });
 
+        async function fetchGoogleSheetsData() {
+          const sheets = google.sheets({version: 'v4', auth: authClient});
+          const response = await sheets.spreadsheets.values.get({
+              spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+              range: process.env.GOOGLE_SHEETS_RANGE,
+          });
+          return response.data.values; // Return the sheet data
+      }
 
         // ... (login endpoint code using authClient)
         app.post('/api/login', async (req, res) => { 
           const { email, password, churchid } = req.body;
             console.log("Received login request:", { email, churchid }); // Log received credentials
-            
+            const rows = await fetchGoogleSheetsData(); // Fetch data here
               try {
+                
                 const sheets = google.sheets({ version: 'v4', auth: authClient });
                 const response = await sheets.spreadsheets.values.get({
                   spreadsheetId: spreadsheetId,
                   range: range,
+                  
+
+                  
                 });
             
+                if (!rows) {
+                  return res.status(500).json({message: 'Error fetching data from Google Sheets'});
+              }
                 if (!response.data || !response.data.values) {
                   console.error("No data received from Google Sheets or no values present.");
                   return res.status(500).json({ message: 'Error fetching data from Google Sheets' });
