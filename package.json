@@ -2,6 +2,8 @@
   "name": "mcgi-back",
   "version": "0.1.0",
   "private": true,
+  "description": "Back-end for Members Church Of God International using Node.js and Express.  Integrates with Google Suite and handles authentication, membership management, event registration, and online giving.",
+  "main": "server.js",
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "axios": "^1.7.9",
@@ -12,9 +14,14 @@
     "googleapis": "^144.0.0",
     "openai": "^4.81.0",
     "pdf-lib": "^1.17.1"
+  
+  },
+  "engines": {
+    "node": "20.18.2"  
   },
   "scripts": {
-    "start": "node server.js"
+     "start": "node server.js"
+    
   },
   "eslintConfig": {
     "extends": [
@@ -33,5 +40,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {
+    "react-scripts": "^5.0.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
