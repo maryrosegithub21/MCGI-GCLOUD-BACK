@@ -1,11 +1,12 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 .env
 manifest.json
-
+.qodo
 # dependencies
 /node_modules
 /.pnp
 .pnp.js
+.mcgi-app-450700-7a8a40928f3e.json
 
 # testing
 /coverage
